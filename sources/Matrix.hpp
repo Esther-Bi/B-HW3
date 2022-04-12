@@ -14,17 +14,17 @@ namespace zich{
             int columns;
             std::vector<double> mat;
         public:
-            Matrix(vector<double> const & , int , int);
-            Matrix(zich::Matrix const & other);
+            Matrix(vector<double> const & , int , int); // constructor
+            Matrix(zich::Matrix const & other); // copy constructor
 
             int get_rows()const;
             int get_columns()const;
             vector<double> get_mat();
             Matrix operator + (Matrix &);
             Matrix operator - (Matrix &);
-            friend Matrix operator * (double const & , Matrix); //  סקלר לפני הכפל
-            Matrix operator * (double); // סקלר אחרי הכפל
-            Matrix operator * (Matrix &); // כפל מטריצות
+            friend Matrix operator * (double const & , Matrix); // scalar before *
+            Matrix operator * (double); // scalar after *
+            Matrix operator * (Matrix &); // matrices multiplication
             Matrix& operator *= (Matrix &);
             Matrix& operator *= (double);
             Matrix& operator += (Matrix &);

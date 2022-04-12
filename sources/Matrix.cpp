@@ -7,24 +7,22 @@ using namespace std;
 
 namespace zich{
 
-    Matrix::Matrix(vector<double> const & vec , int row , int col){
+    Matrix::Matrix(vector<double> const & vec , int row , int col){ // constructor
         if (vec.empty() || row<1 || col<1 || vec.size()!=row*col){
             throw std::domain_error("invalid input");
         }
         this->rows=row;
         this->columns=col;
         vector<double> mat;
-        //mat.reserve(vec.size());
         this->mat=vec;
     }
-    Matrix::Matrix(zich::Matrix const & other){
+    Matrix::Matrix(zich::Matrix const & other){ // copy constructor
         if (other.mat.empty() || other.rows<1 || other.columns<1 || other.mat.size()!=other.rows*other.columns){
             throw std::domain_error("invalid input");
         }
         this->rows=other.rows;
         this->columns=other.columns;
         vector<double> vec;
-        //vec.reserve(other.mat.size());
         for (int i=0 ; i<other.mat.size() ; i++){
             double temp = other.mat[(unsigned int)i];
             vec.push_back(temp);
@@ -32,97 +30,88 @@ namespace zich{
         this->mat=vec;
     }
 
-    int Matrix::get_rows() const{
+    int Matrix::get_rows() const{ // getter
         return this->rows;
     }
-
-    int Matrix::get_columns()const{
+    int Matrix::get_columns()const{ // getter
         return this->columns;
     }
-
-    vector<double> Matrix::get_mat(){
+    vector<double> Matrix::get_mat(){ // getter
         return this->mat;
     }
-
     Matrix Matrix::operator + (Matrix & other){
         if (this->rows!=other.rows || this->columns!=other.columns){
             throw std::domain_error( "matrices are not the same size");
         }
         vector<double> vec;
-        // vec.reserve(this->mat.size());
         for (int i=0 ; i<this->mat.size() ; i++){
             double temp = this->mat[(unsigned int)i]+other.mat[(unsigned int)i];
             vec.push_back(temp);
         }
-        Matrix ans{vec,this->rows,this->columns};
+        Matrix ans{vec,this->rows,this->columns}; // new matrix with sumed values
         return ans;
     }
-
     Matrix Matrix::operator - (Matrix & other){
         if (this->rows!=other.rows || this->columns!=other.columns){
             throw std::domain_error( "matrices are not the same size");
         }
         vector<double> vec;
-        // vec.reserve(this->mat.size());
         for (int i=0 ; i<this->mat.size() ; i++){
             double temp = this->mat[(unsigned int)i]-other.mat[(unsigned int)i];
             vec.push_back(temp);
         }
-        Matrix ans{vec,this->rows,this->columns};
+        Matrix ans{vec,this->rows,this->columns}; // new matrix with sumed values
         return ans;
     }
-    Matrix operator * (double const & num , Matrix other){
+    Matrix operator * (double const & num , Matrix other){ // scalar before *
         vector<double> vec;
-        // vec.reserve(other.mat.size());
         for (int i=0 ; i<other.mat.size() ; i++){
             double temp = other.mat[(unsigned int)i]*num;
             vec.push_back(temp);
         }
-        Matrix ans{vec,other.rows,other.columns};
+        Matrix ans{vec,other.rows,other.columns}; // new matrix with nuled values
         return ans;
-    } //  סקלר לפני הכפל
-    Matrix Matrix::operator * (double num){
+    }
+    Matrix Matrix::operator * (double num){ // scalar after *
         vector<double> vec;
-        // vec.reserve(this->mat.size());
         for (int i=0 ; i<this->mat.size() ; i++){
             double temp = this->mat[(unsigned int)i]*num;
             vec.push_back(temp);
         }
-        Matrix ans{vec,this->rows,this->columns};
+        Matrix ans{vec,this->rows,this->columns}; // new matrix with nuled values
         return ans;
-    } // סקלר אארחי הכפל
-    Matrix Matrix::operator * (Matrix & other){
+    }
+    Matrix Matrix::operator * (Matrix & other){ // matrices multiplication
         if (this->columns!=other.rows){
             throw std::domain_error( "undefined matrices multiplication");
         }
         int size = this->rows*other.columns;
-        vector<double> vec((unsigned long)size , 0);
-        // vec.reserve((unsigned long)size);
+        vector<double> vec((unsigned long)size , 0); // initialize with zeros
         for (int i=0 ; i<this->mat.size() ; i++){
             int for_row = i/this->columns;
             for (int j=0 ; j<other.columns ; j++){
-                int for_ind = (other.columns*for_row) + j;
-                int for_col = ((i%this->columns)*other.columns) + j;
+                int for_ind = (other.columns*for_row) + j; // the right index in the new matrix
+                int for_col = ((i%this->columns)*other.columns) + j; // the right index in the second matrix
                 double first = this->mat[(unsigned long)i];
                 double second = other.mat[(unsigned long)for_col];
                 double mul = first*second;
                 vec.at((unsigned long)for_ind) += mul;
             }
         }
-        Matrix ans{vec,this->rows,other.columns};
+        Matrix ans{vec,this->rows,other.columns}; // return a new matrix with results
         return ans;
-    } // כפל מטריצות
-    Matrix& Matrix::operator *= (Matrix & other){
+    }
+    Matrix& Matrix::operator *= (Matrix & other){ // matrices multiplication
         if (this->columns!=other.rows){
             throw std::domain_error( "undefined matrices multiplication");
         }
         int size = this->rows*other.columns;
-        vector<double> vec((unsigned long)size , 0);
+        vector<double> vec((unsigned long)size , 0); // initialize with zeros
         for (int i=0 ; i<this->mat.size() ; i++){
             int for_row = i/this->columns;
             for (int j=0 ; j<other.columns ; j++){
-                int for_ind = (other.columns*for_row) + j;
-                int for_col = ((i%this->columns)*other.columns) + j;
+                int for_ind = (other.columns*for_row) + j; // the right index in the new matrix
+                int for_col = ((i%this->columns)*other.columns) + j; // the right index in the second matrix
                 double first = this->mat[(unsigned long)i];
                 double second = other.mat[(unsigned long)for_col];
                 double mul = first*second;
@@ -130,15 +119,14 @@ namespace zich{
             }
         }
         mat.resize((unsigned int)size);
-        for (int i=0 ; i<this->mat.size() ; i++){
+        for (int i=0 ; i<this->mat.size() ; i++){ // copy fron new vector to this vector
             this->mat.at((unsigned long)i) = vec.at((unsigned long)i);
         }
-        this->columns = other.columns;
+        this->columns = other.columns; // update columns
         return *this;
     }
     Matrix& Matrix::operator *= (double num){
         vector<double> vec;
-        // vec.reserve(this->mat.size());
         for (int i=0 ; i<this->mat.size() ; i++){
             this->mat[(unsigned int)i] *= num;
         }
@@ -149,7 +137,6 @@ namespace zich{
             throw std::domain_error( "matrices are not the same size");
         }
         vector<double> vec;
-        // vec.reserve(this->mat.size());
         for (int i=0 ; i<this->mat.size() ; i++){
             this->mat[(unsigned int)i] += other.mat[(unsigned int)i];
         }
@@ -160,7 +147,6 @@ namespace zich{
             throw std::domain_error( "matrices are not the same size");
         }
         vector<double> vec;
-        // vec.reserve(this->mat.size());
         for (int i=0 ; i<this->mat.size() ; i++){
             this->mat[(unsigned int)i] -= other.mat[(unsigned int)i];
         }
@@ -252,25 +238,23 @@ namespace zich{
         }
         return flag;
     }
-    Matrix operator + (Matrix & other){
+    Matrix operator + (Matrix & other){ // unari plus
         vector<double> vec;
-        // vec.reserve(other.mat.size());
         for (int i=0 ; i<other.mat.size() ; i++){
             double temp = other.mat[(unsigned int)i];
             vec.push_back(temp);
         }
-        Matrix ans{vec,other.rows,other.columns};
+        Matrix ans{vec,other.rows,other.columns}; // return a new matrix with same values
         return ans;
-    } // unari
-    Matrix operator - (Matrix & other){
+    }
+    Matrix operator - (Matrix & other){ // unari minus
         vector<double> vec;
-        // vec.reserve(other.mat.size());
         for (int i=0 ; i<other.mat.size() ; i++){
             double temp = -1 * other.mat[(unsigned int)i];
             vec.push_back(temp);
         }
         Matrix ans{vec,other.rows,other.columns};
-        return ans;
+        return ans; // return a new matrix with minus the same values
     }
     std::ostream& operator << (std::ostream& os , Matrix & matrix){
         for (int row=0 ; row<matrix.get_rows() ; row++){
@@ -291,7 +275,7 @@ namespace zich{
         }
         return os;
     }
-    vector<string> splitString(string str, char spl){
+    vector<string> splitString(string str, char spl){ // split string by char
         string temp;
         vector<string> splitted;
         bool in_out = false;
@@ -299,7 +283,7 @@ namespace zich{
             if (str[(unsigned int)i] == spl && !temp.empty()){
                 splitted.push_back(temp);
                 temp = "";
-                if (spl == ','){
+                if (spl == ','){ // check if after every ',' there is a ' ' and jump by another char
                     if (str[(unsigned int)i+1] != ' '){
                         throw std::domain_error("invalid input");
                     }
@@ -308,6 +292,7 @@ namespace zich{
             }
             else{
                 if (str[(unsigned int)i] == '[' || str[(unsigned int)i] == ']'){
+                    // check if after every '[' there is a ']'
                     if (str[(unsigned int)i] == '['){
                         if (!in_out){
                             in_out=true;
@@ -335,6 +320,7 @@ namespace zich{
         int col = 0;
         std::string input;
         char c = 0;
+        // get all input
         while (c != '\n'){
             c = is.get();
             input += c;
@@ -343,6 +329,7 @@ namespace zich{
         std::vector<std::string> rows;
         std::vector<std::string> num_in_row;
         std::vector<double> vec;
+        // use split funcion for splitting by ',' ans then by ' ' for each row
         rows = splitString(input , ',');
         for (int i=0 ; i<rows.size() ; i++){
             row++;
@@ -391,20 +378,3 @@ namespace zich{
     }
 
 }
-
-// int main(){
-//    std::vector<double> vec7 = {1,2,3,1,2,3};
-//    std::vector<double> vec8 = {2,3,2,3,2,3};
-//    zich::Matrix a{vec7, 3, 2};
-//    zich::Matrix b{vec8, 2, 3};
-//    cout << a.get_columns() << endl;
-//    cout << a.get_rows() << endl;
-//    cout << a << endl;
-// //    a*=b;
-// //    cout << a << endl;
-//     // cout << (4*a).get_mat().at(3) << endl;
-//     cout << (a*b).get_mat().at(3) << endl;
-//    cout << a << endl;
-// //    cout << (a*b) << endl;
-//    return 1;
-// }
